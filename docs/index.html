@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do Collaborations Make Songs More Popular on Spotify?</title>
+<meta name="description" content="Measuring the featured-artist effect on Spotify popularity with proper statistical controls — and catching two of my own overclaims along the way.">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <div class="nav-brand">
+      <img src="assets/img/spotify-logo-green.png" alt="Spotify logo">
+      <span>COGS 108 &middot; Independent Reconstruction</span>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
+    <div class="nav-links" id="navLinks">
+      <a href="#objective">Objective</a>
+      <a href="#dataset">Data</a>
+      <a href="#eda">EDA</a>
+      <a href="#comparison">Group Comparison</a>
+      <a href="#regression">Regression</a>
+      <a href="#decomposition">Decomposition</a>
+      <a href="#overclaim">The Overclaim</a>
+      <a href="#credits">Credits</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <img class="hero-logo" src="assets/img/spotify-logo-green.png" alt="Spotify">
+      <h1>Do collaborations make songs <span class="accent">more popular</span> on Spotify?</h1>
+      <p class="lede">Measuring the featured-artist effect with proper statistical controls — and catching two of my own overclaims along the way. An independent reconstruction and extension of a COGS 108 (UC San Diego) team project.</p>
+      <div class="hero-badges">
+        <span class="badge green">n = 89,740 tracks</span>
+        <span class="badge">OLS + HC3 robust SEs</span>
+        <span class="badge">Genre fixed effects</span>
+        <span class="badge">Effect sizes + 95% CIs</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#overclaim">See what changed &rarr;</a>
+        <a class="btn btn-ghost" href="https://github.com/sonalishyma/Measuring-the-Impact-of-Featured-Artists-on-Spotify" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <img src="assets/img/spotify-disco.jpg" alt="Stylized Spotify logo rendered as a disco ball">
+    </div>
+  </div>
+</header>
+
+<section id="objective">
+  <div class="wrap">
+    <span class="eyebrow">01 &middot; The Objective</span>
+    <h2>The headline finding, up front</h2>
+    <p class="lede">Featured tracks look more popular than solo tracks on Spotify (p &asymp; 1e-26). This project shows the gap is real but tiny, and that almost all of it comes from genre — not from collaboration itself.</p>
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="v">+1.4</div><div class="l">points, raw gap (0&ndash;100 scale)</div><div class="sub">featured minus solo</div></div>
+      <div class="stat-tile"><div class="v">d &asymp; 0.07</div><div class="l">Cohen's d</div><div class="sub">the two distributions overlap almost completely</div></div>
+      <div class="stat-tile"><div class="v">99%</div><div class="l">of the raw gap is genre composition</div><div class="sub">not a collaboration premium</div></div>
+      <div class="stat-tile"><div class="v">+0.28</div><div class="l">adjusted effect, controls + genre FE</div><div class="sub">95% CI &minus;0.01 to +0.57, p = 0.06</div></div>
+    </div>
+    <div class="callout">
+      <span class="k">Research question</span>
+      <p>Do tracks featuring at least one other artist have higher Spotify popularity than solo tracks, controlling for duration, explicitness, and the audio features energy and danceability &mdash; and, in the fuller specification, valence, loudness, and genre?</p>
+    </div>
+  </div>
+</section>
+
+<section id="dataset">
+  <div class="wrap">
+    <span class="eyebrow">02 &middot; Dataset Overview</span>
+    <h2>What "featured" looks like in practice</h2>
+    <p class="lede">A "featured" track lists another artist in its credits or title (e.g. "feat. Name"); a "solo" track does not. These aren't rows from the analysis sample &mdash; they're familiar catalog examples to make the definition concrete.</p>
+
+    <div class="track-strip">
+      <div class="track-card">
+        <img src="assets/img/album-sprinter-dave-centralcee.jpg" alt="Sprinter album art">
+        <div class="t-title">Sprinter</div>
+        <div class="t-artist">Dave &amp; Central Cee</div>
+        <span class="tag feat">has_feature = 1</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-funkwavbounces-calvinharris.jpg" alt="Funk Wav Bounces Vol. 1 album art">
+        <div class="t-title">Funk Wav Bounces Vol. 1</div>
+        <div class="t-artist">Calvin Harris</div>
+        <span class="tag feat">mostly features</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-thriller-michaeljackson.jpg" alt="Thriller album art">
+        <div class="t-title">Thriller</div>
+        <div class="t-artist">Michael Jackson</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-25-adele.jpg" alt="25 album art">
+        <div class="t-title">25</div>
+        <div class="t-artist">Adele</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-views-drake.jpg" alt="Views album art">
+        <div class="t-title">Views</div>
+        <div class="t-artist">Drake</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-currents-tameimpala.jpg" alt="Currents album art">
+        <div class="t-title">Currents</div>
+        <div class="t-artist">Tame Impala</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-eternalsunshine-arianagrande.jpg" alt="Eternal Sunshine album art">
+        <div class="t-title">Eternal Sunshine</div>
+        <div class="t-artist">Ariana Grande</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-bluewaterroad-kehlani.jpg" alt="Blue Water Road album art">
+        <div class="t-title">Blue Water Road</div>
+        <div class="t-artist">Kehlani</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-dopamine-liltecca.jpg" alt="Dopamine album art">
+        <div class="t-title">Dopamine</div>
+        <div class="t-artist">Lil Tecca</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-comehome-jackharlow.jpg" alt="Come Home The Kids Miss You album art">
+        <div class="t-title">Come Home The Kids Miss You</div>
+        <div class="t-artist">Jack Harlow</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+      <div class="track-card">
+        <img src="assets/img/album-doiclenchmyfists-ridgeclub.jpg" alt="Do I Clench My Fists album art">
+        <div class="t-title">Do I Clench My Fists</div>
+        <div class="t-artist">Ridgeclub</div>
+        <span class="tag solo">has_feature = 0</span>
+      </div>
+    </div>
+
+    <div class="two-col" style="margin-top:36px;">
+      <div class="card">
+        <h3>Source</h3>
+        <p style="color:var(--text-secondary); margin-top:10px;">Spotify Tracks Dataset (maharshipandya, via Kaggle/Hugging Face) &mdash; 114,000 track&ndash;genre rows with Spotify's <code>popularity</code> score, audio features, and <code>track_genre</code>. Deduplicated deterministically by <code>track_id</code>.</p>
+      </div>
+      <div class="card">
+        <h3>Key variables</h3>
+        <ul class="plain">
+          <li><strong style="color:var(--text-primary)">Outcome</strong> &mdash; popularity (0&ndash;100)</li>
+          <li><strong style="color:var(--text-primary)">Predictor</strong> &mdash; has_feature (multi-artist credit or title marker)</li>
+          <li><strong style="color:var(--text-primary)">Controls</strong> &mdash; duration, explicit, energy, danceability, valence, loudness, genre</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cleaning">
+  <div class="wrap">
+    <span class="eyebrow">03 &middot; Data Cleaning Pipeline</span>
+    <h2>From 114,000 rows to 89,740 tracks</h2>
+    <div class="pipeline-steps">
+      <div class="pipeline-step"><div class="n">STEP 1</div><h4>Deduplicate</h4><p>Drop duplicates by <code>track_id</code> &mdash; deterministic, reproducible.</p></div>
+      <div class="pipeline-step"><div class="n">STEP 2</div><h4>Fix duration</h4><p>Convert duration_ms &rarr; duration_sec; drop tracks with duration = 0.</p></div>
+      <div class="pipeline-step"><div class="n">STEP 3</div><h4>Flag explicit</h4><p>Cast the explicit flag to a clean 0/1 integer.</p></div>
+      <div class="pipeline-step"><div class="n">STEP 4</div><h4>Detect features</h4><p>has_feature = 1 if multiple artists are credited (<code>;</code>-separated) or the title contains "feat.", "ft.", "featuring", or "with" as a whole word.</p></div>
+    </div>
+    <div class="callout">
+      <span class="k">Fingerprint check</span>
+      <p>The original team's processed files were lost after the course ended. This dataset was re-identified by matching summary statistics from the final presentation: 89,740 unique tracks; explicit split 82,036/7,704; group means 32.81/34.26. This rebuild reproduces every one of those numbers to within one row.</p>
+    </div>
+  </div>
+</section>
+
+<section id="eda">
+  <div class="wrap">
+    <span class="eyebrow">04 &middot; Exploratory Data Analysis</span>
+    <h2>Popularity is skewed and zero-inflated</h2>
+    <p class="lede">A large share of tracks sit at exactly 0 popularity &mdash; low or no recent engagement. That shapes every test downstream: a rank-based test instead of a t-test, and a dedicated robustness check that excludes the zero spike.</p>
+    <figure class="figure">
+      <img src="assets/figures/fig1_eda_distributions.png" alt="Distributions of popularity, duration, energy, and danceability">
+      <figcaption>Distributions of the outcome (popularity) and key controls (duration, energy, danceability). Generated directly by the executed analysis notebook.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="comparison">
+  <div class="wrap">
+    <span class="eyebrow">05 &middot; Featured vs. Solo</span>
+    <h2>The original analysis, reproduced &mdash; plus the effect sizes it omitted</h2>
+    <p class="lede">Mann&ndash;Whitney U test (popularity is non-normal), plus rank-biserial r and Cohen's d, which the original presentation never reported.</p>
+    <figure class="figure">
+      <img src="assets/figures/fig2_group_comparison.png" alt="Popularity distribution and boxplot comparing featured vs solo tracks">
+      <figcaption>Featured tracks sit slightly higher &mdash; but "slightly" is doing a lot of work here.</figcaption>
+    </figure>
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="v">+1.41</div><div class="l">raw difference in means</div><div class="sub">95% CI [+1.09, +1.73]</div></div>
+      <div class="stat-tile"><div class="v neutral">p &asymp; 4.2e-26</div><div class="l">Mann&ndash;Whitney U, one-sided</div><div class="sub">essentially guaranteed at n &asymp; 90k</div></div>
+      <div class="stat-tile"><div class="v">r = 0.046</div><div class="l">rank-biserial correlation</div><div class="sub">tiny</div></div>
+      <div class="stat-tile"><div class="v">d = 0.069</div><div class="l">Cohen's d</div><div class="sub">distributions overlap ~97%</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="regression">
+  <div class="wrap">
+    <span class="eyebrow">06 &middot; The Regression Our Proposal Specified</span>
+    <h2>Completing the plan the final presentation never delivered</h2>
+    <p class="lede">The project proposal planned an OLS regression with HC3 robust standard errors, a 95% CI, a p-value, and a standardized effect size &mdash; with genre among the controls. The final presentation stopped at the bivariate comparison above. This section completes it.</p>
+    <div class="table-scroll">
+    <table>
+      <thead><tr><th>Specification</th><th>Coefficient</th><th>95% CI</th><th>p</th><th>R&sup2;</th></tr></thead>
+      <tbody>
+        <tr><td>Raw difference in means</td><td class="num">+1.41</td><td>[+1.10, +1.72]</td><td>&asymp;1e-26 (M&ndash;W)</td><td>&mdash;</td></tr>
+        <tr><td>Spec 1: duration + explicit + energy + danceability</td><td class="num">+1.08</td><td>[+0.76, +1.40]</td><td>4e-11</td><td>0.007</td></tr>
+        <tr><td>Spec 2: + valence + loudness + genre fixed effects</td><td class="num">+0.28</td><td>[&minus;0.01, +0.57]</td><td>0.062</td><td>0.329</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="callout">
+      <span class="k">Diagnostics</span>
+      <p>Variance inflation factors across all Spec 2 predictors stay below 2.6 &mdash; well under the conventional threshold of 5. Multicollinearity is not driving the shrinkage.</p>
+    </div>
+  </div>
+</section>
+
+<section id="decomposition">
+  <div class="wrap">
+    <span class="eyebrow">07 &middot; Why The Effect Shrinks</span>
+    <h2>Genre composition, not a collaboration premium</h2>
+    <p class="lede">Genre fixed effects take R&sup2; from ~0.01 to ~0.33 and cut the featured-artist coefficient by roughly three quarters. An exact shift-share decomposition splits the raw gap into genre composition and the within-genre gap &mdash; the two terms sum to the raw gap with no residual, by construction.</p>
+    <figure class="figure">
+      <img src="assets/figures/fig3_genre_composition.png" alt="Bar chart decomposing the raw gap into genre composition and within-genre gap, plus a genre landscape scatterplot">
+      <figcaption>Left: the raw +1.41 gap decomposed. Right: genres plotted by featured-track share vs. mean popularity &mdash; collaborations concentrate in genres (dancehall, hip-hop, reggaeton) that are already more popular.</figcaption>
+    </figure>
+    <div class="callout">
+      <span class="k">A second self-caught error</span>
+      <p>The first version of this decomposition compared each group's genre exposure to a <em>blended</em> genre-level mean, mixing featured and solo tracks together. That's a natural thing to write &mdash; but it's not algebraically correct: the two components didn't sum back to the raw gap, landing about 0.4 points short, because the blended mean already absorbs part of the within-genre effect it's supposed to be separate from. A regression test written for this rebuild (<code>test_genre_decomposition_sums_to_raw_gap</code>) catches exactly this. The fix, a proper shift-share decomposition, moves genre composition's share of the gap from an approximate 73% to an exact <strong style="color:var(--text-primary)">99%</strong>. The within-genre conclusion &mdash; effectively zero &mdash; is unchanged either way.</p>
+    </div>
+  </div>
+</section>
+
+<section id="robustness">
+  <div class="wrap">
+    <span class="eyebrow">08 &middot; Robustness</span>
+    <h2>Same story, four different ways of counting "featured"</h2>
+    <p class="lede">Alternate detection rules, excluding the popularity = 0 spike, and excluding remix/live/acoustic/remaster versions &mdash; the adjusted effect stays between roughly zero and half a point every time.</p>
+    <figure class="figure">
+      <img src="assets/figures/fig4_effect_across_specs.png" alt="Forest plot of the featured-artist effect across raw comparison, both regression specs, and four robustness variants">
+      <figcaption>The estimated effect shrinks toward zero as controls improve, and stays there under every alternative sample definition.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="overclaim">
+  <div class="wrap">
+    <span class="eyebrow">09 &middot; What Changed</span>
+    <h2>Statistically significant &ne; practically significant</h2>
+    <p class="lede">The original computation was correct. The conclusion drawn from it was stronger than the evidence supported.</p>
+    <div class="quote-compare">
+      <div class="quote-block old">
+        <span class="k">Original presentation</span>
+        <blockquote>&ldquo;Featured artists meaningfully boost visibility and popularity on Spotify&hellip; collaborations strategically elevate track success.&rdquo;</blockquote>
+        <p class="note">Based on p &asymp; 1e-29 alone &mdash; without ever reporting an effect size.</p>
+      </div>
+      <div class="quote-block new">
+        <span class="k">This reconstruction</span>
+        <blockquote>The raw gap is real but tiny (+1.4 points, d &asymp; 0.07). 99% of it is genre composition. Controlling for genre and audio features, the adjusted effect is +0.28 points &mdash; between roughly zero and half a point across every robustness check.</blockquote>
+        <p class="note">At n &asymp; 90,000, statistical significance is nearly guaranteed for any nonzero difference. The analytical question was always effect <em>size</em>.</p>
+      </div>
+    </div>
+    <div class="callout">
+      <span class="k">Why this differs from stream-based studies reporting &ge;5% more streams for collaborations</span>
+      <p>Different outcome (Spotify's recency-weighted popularity score, not stream counts); different sample (a broad catalog snapshot, not new chart releases); and unobserved <strong style="color:var(--text-primary)">artist fame</strong> &mdash; which biases this estimate <em>upward</em> if anything, since famous artists both collaborate more and are more popular. That the adjusted effect is still near zero makes the null-ish result more credible, not less.</p>
+    </div>
+  </div>
+</section>
+
+<section id="limitations">
+  <div class="wrap">
+    <span class="eyebrow">10 &middot; Limitations</span>
+    <h2>What this analysis can't tell you</h2>
+    <ul class="plain">
+      <li>Popularity is a platform-defined, recency-weighted score &mdash; it describes Spotify's metric, not intrinsic quality.</li>
+      <li>Genre is one label per track from the source dataset's playlist assignment.</li>
+      <li>Release year is unavailable in this dataset, though it was in the original proposal's plan.</li>
+      <li>The data are a single snapshot &mdash; no popularity trajectories over time.</li>
+      <li>No causal claim is possible: artists choose when and with whom to collaborate.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="credits">
+  <div class="wrap">
+    <span class="eyebrow">11 &middot; Credits &amp; Attribution</span>
+    <h2>Sources, artists, and the original team</h2>
+
+    <div class="two-col">
+      <div class="card">
+        <h3>Data &amp; platform</h3>
+        <p style="color:var(--text-secondary); margin-top:10px;">
+          Analysis built on the <a href="https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset" target="_blank" rel="noopener">Spotify Tracks Dataset</a> (maharshipandya, via Kaggle). Popularity scores, audio features, and the Spotify name/logo are the property of Spotify AB, referenced here for academic, non-commercial commentary on publicly available data.
+        </p>
+        <img src="assets/img/spotify-logo-green.png" alt="Spotify" style="height:22px; margin-top:14px; opacity:0.85;">
+      </div>
+      <div class="card">
+        <h3>Original team &mdash; COGS 108, Group 34</h3>
+        <p class="team">Jose Enrique Siono Gutierrez, Zulema Zermeno, Sahar Zahir, <strong>Sonali Singh</strong>, Teresa Jia.</p>
+        <p style="color:var(--text-secondary); margin-top:10px;">This site is an independent reconstruction and extension by Sonali Singh. Original team roles: analysis, background research, visualization, writing (original draft).</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:34px;">Album art shown above</h3>
+    <p style="color:var(--text-secondary); margin-top:8px;">Cover art is used solely to illustrate the has_feature definition and belongs to the respective label/artist. Not used commercially, not modified beyond thumbnail resizing.</p>
+    <div class="credits-grid">
+      <div class="credit-item"><img src="assets/img/album-sprinter-dave-centralcee.jpg" alt=""><div class="ci-t">Sprinter &mdash; Dave &amp; Central Cee</div></div>
+      <div class="credit-item"><img src="assets/img/album-funkwavbounces-calvinharris.jpg" alt=""><div class="ci-t">Funk Wav Bounces Vol. 1 &mdash; Calvin Harris</div></div>
+      <div class="credit-item"><img src="assets/img/album-thriller-michaeljackson.jpg" alt=""><div class="ci-t">Thriller &mdash; Michael Jackson</div></div>
+      <div class="credit-item"><img src="assets/img/album-25-adele.jpg" alt=""><div class="ci-t">25 &mdash; Adele</div></div>
+      <div class="credit-item"><img src="assets/img/album-views-drake.jpg" alt=""><div class="ci-t">Views &mdash; Drake</div></div>
+      <div class="credit-item"><img src="assets/img/album-currents-tameimpala.jpg" alt=""><div class="ci-t">Currents &mdash; Tame Impala</div></div>
+      <div class="credit-item"><img src="assets/img/album-eternalsunshine-arianagrande.jpg" alt=""><div class="ci-t">Eternal Sunshine &mdash; Ariana Grande</div></div>
+      <div class="credit-item"><img src="assets/img/album-bluewaterroad-kehlani.jpg" alt=""><div class="ci-t">Blue Water Road &mdash; Kehlani</div></div>
+      <div class="credit-item"><img src="assets/img/album-dopamine-liltecca.jpg" alt=""><div class="ci-t">Dopamine &mdash; Lil Tecca</div></div>
+      <div class="credit-item"><img src="assets/img/album-comehome-jackharlow.jpg" alt=""><div class="ci-t">Come Home The Kids Miss You &mdash; Jack Harlow</div></div>
+      <div class="credit-item"><img src="assets/img/album-doiclenchmyfists-ridgeclub.jpg" alt=""><div class="ci-t">Do I Clench My Fists &mdash; Ridgeclub</div></div>
+    </div>
+
+    <p class="footer-note">All rights to the Spotify name, logo, and album artwork belong to their respective owners (Spotify AB and the pictured labels/artists). This is an unaffiliated student research project, shared for academic and portfolio purposes only &mdash; not sponsored by or affiliated with Spotify. No revenue is generated from this page.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-grid">
+    <img class="footer-logo" src="assets/img/spotify-logo-green.png" alt="Spotify">
+    <div class="footer-links">
+      <a href="https://github.com/sonalishyma/Measuring-the-Impact-of-Featured-Artists-on-Spotify" target="_blank" rel="noopener">GitHub Repo</a>
+      <a href="https://www.kaggle.com/datasets/maharshipandya/-spotify-tracks-dataset" target="_blank" rel="noopener">Dataset</a>
+      <a href="#top">Back to top</a>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
