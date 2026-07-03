@@ -125,72 +125,8 @@ section:first-of-type { border-top: none; }
 }
 .badge.green { border-color: rgba(29,185,84,0.4); color: var(--green-bright); background: rgba(29,185,84,0.08); }
 
-.hero-art { position: relative; display: flex; justify-content: center; align-items: center; padding: 30px; }
-.hero-art::before {
-  content: ""; position: absolute; inset: 0; border-radius: 50%;
-  background: radial-gradient(circle, rgba(29,185,84,0.35), transparent 70%);
-  filter: blur(30px); z-index: 0;
-}
-
-/* A CSS-only "3D" disco ball: the sphere's shading stays fixed (as if lit by a
-   fixed spotlight) while the facet texture scrolls across it and sparkles
-   twinkle independently — this reads as a rotating sphere. Spinning the whole
-   flat shape instead (a naive transform:rotate on a photo) looks like a flat
-   disc turning, not a ball, which is why that approach was replaced. */
-.discoball {
-  position: relative; z-index: 1;
-  width: clamp(240px, 30vw, 440px); aspect-ratio: 1;
-  border-radius: 50%;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 32% 26%, #f3fff8 0%, #8ff0b8 9%, #22c766 28%, #149a4d 50%, #0b6534 72%, #062f18 100%);
-  box-shadow:
-    0 0 90px rgba(29,185,84,0.4),
-    inset -22px -26px 55px rgba(0,0,0,0.55),
-    inset 14px 12px 36px rgba(255,255,255,0.18),
-    0 25px 70px rgba(0,0,0,0.6);
-}
-.discoball-tiles {
-  position: absolute; inset: -30%;
-  background-image:
-    repeating-linear-gradient(55deg, rgba(255,255,255,0.22) 0 1.5px, transparent 1.5px 22px),
-    repeating-linear-gradient(-55deg, rgba(255,255,255,0.15) 0 1.5px, transparent 1.5px 22px),
-    repeating-linear-gradient(0deg, rgba(0,0,0,0.28) 0 1.5px, transparent 1.5px 22px);
-  mix-blend-mode: overlay;
-  animation: tileScroll 5s linear infinite;
-}
-@keyframes tileScroll {
-  from { background-position: 0 0, 0 0, 0 0; }
-  to   { background-position: 260px 0, -260px 0, 0 0; }
-}
-.discoball-logo {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: 46%; opacity: 0.94;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.55));
-  pointer-events: none;
-}
-.sparkle {
-  position: absolute; width: 14px; height: 14px;
-  background: radial-gradient(circle, #ffffff 0%, rgba(255,255,255,0.75) 40%, transparent 72%);
-  clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
-  opacity: 0; pointer-events: none;
-  animation: twinkle 2.4s ease-in-out infinite;
-}
-@keyframes twinkle {
-  0%, 100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
-  50% { opacity: 1; transform: scale(1) rotate(25deg); }
-}
-.s1 { top: 16%; left: 24%; width: 15px; height: 15px; animation-delay: 0s; animation-duration: 2.2s; }
-.s2 { top: 28%; left: 68%; width: 10px; height: 10px; animation-delay: .6s; animation-duration: 1.8s; }
-.s3 { top: 60%; left: 18%; width: 12px; height: 12px; animation-delay: 1.1s; animation-duration: 2.5s; }
-.s4 { top: 72%; left: 60%; width: 18px; height: 18px; animation-delay: .3s; animation-duration: 2.9s; }
-.s5 { top: 46%; left: 84%; width: 9px;  height: 9px;  animation-delay: 1.6s; animation-duration: 2s; }
-.s6 { top: 10%; left: 52%; width: 11px; height: 11px; animation-delay: .9s; animation-duration: 2.6s; }
-
-@media (prefers-reduced-motion: reduce) {
-  .discoball-tiles { animation: none; }
-  .sparkle { animation: none; opacity: 0; }
-}
+.hero-art { position: relative; display: flex; justify-content: center; }
+.hero-art img { border-radius: 16px; box-shadow: var(--shadow); max-width: min(400px, 100%); }
 body { overflow-x: hidden; }
 
 .cta-row { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
