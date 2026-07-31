@@ -338,15 +338,6 @@ body {
 }
 .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(280px, 390px); gap: 64px; }
 .hero-logo { display: none; }
-.hero-type {
-  display: block;
-  margin-bottom: 12px;
-  font-size: .76rem;
-  font-weight: 800;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-.hero-type::before { content: "●"; color: #3d91f4; margin-right: 7px; }
 .hero h1 { max-width: 850px; font-size: clamp(3rem, 6.1vw, 6rem); line-height: .96; letter-spacing: -.055em; }
 .hero h1 .accent { color: #fff; }
 .hero .lede { max-width: 790px; color: #d5d5d5; }
