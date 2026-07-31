@@ -268,3 +268,179 @@ footer { padding: 50px 0 70px; }
 
 .team { color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px; }
 .team strong { color: var(--text-primary); }
+
+/* ===== Spotify application layout ===== */
+:root {
+  --sidebar: 248px;
+  --radius: 8px;
+  --maxw: 1240px;
+}
+
+body {
+  padding-left: var(--sidebar);
+  background: #090909;
+}
+
+.nav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar);
+  height: 100vh;
+  background: #000;
+  border: 0;
+  padding: 28px 14px;
+}
+
+.nav .wrap {
+  height: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.nav-brand { padding: 0 10px 28px; gap: 12px; }
+.nav-brand img { height: 28px; }
+.nav-brand span { color: #fff; font-size: 1rem; letter-spacing: 0; }
+.nav-links { display: flex; flex-direction: column; gap: 5px; }
+.nav-links a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: #a7a7a7;
+  font-size: .88rem;
+  transition: background .18s ease, color .18s ease;
+}
+.nav-links a:hover, .nav-links a.active { color: #fff; background: #181818; }
+.nav-icon { width: 24px; color: #d7d7d7; font-weight: 800; text-align: center; }
+.nav-label {
+  padding: 26px 12px 8px;
+  color: #6f6f6f;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.hero {
+  min-height: 650px;
+  display: flex;
+  align-items: flex-end;
+  padding: 110px 0 64px;
+  background:
+    linear-gradient(0deg, #121212 0%, rgba(18,18,18,.12) 65%),
+    radial-gradient(circle at 76% 30%, rgba(30,215,96,.3), transparent 34%),
+    linear-gradient(135deg, #173f2a 0%, #0f241a 38%, #161616 100%);
+}
+.hero-grid { grid-template-columns: minmax(0, 1fr) minmax(280px, 390px); gap: 64px; }
+.hero-logo { display: none; }
+.hero-type {
+  display: block;
+  margin-bottom: 12px;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.hero-type::before { content: "●"; color: #3d91f4; margin-right: 7px; }
+.hero h1 { max-width: 850px; font-size: clamp(3rem, 6.1vw, 6rem); line-height: .96; letter-spacing: -.055em; }
+.hero h1 .accent { color: #fff; }
+.hero .lede { max-width: 790px; color: #d5d5d5; }
+.hero-art img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 50%;
+  filter: drop-shadow(0 28px 34px rgba(0,0,0,.58));
+  transform: rotate(1deg);
+}
+.play-btn { width: 54px; height: 54px; justify-content: center; padding: 0; font-size: 1.15rem; }
+
+section { padding: 78px 0; border: 0; background: #121212; }
+section:nth-of-type(even) { background: #101010; }
+section .wrap { position: relative; }
+section .wrap::before {
+  content: "";
+  position: absolute;
+  top: -26px;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #2c2c2c 12%, #2c2c2c 88%, transparent);
+}
+section:first-of-type .wrap::before { display: none; }
+h2 { font-size: clamp(2rem, 4vw, 3.35rem); letter-spacing: -.045em; }
+.lede { max-width: 840px; }
+
+.stat-tile, .card, .pipeline-step, .chart-panel, .quote-block, .credit-item {
+  border-color: transparent;
+  background: #181818;
+  box-shadow: none;
+  transition: background .2s ease, transform .2s ease;
+}
+.stat-tile:hover, .card:hover, .pipeline-step:hover, .credit-item:hover { background: #242424; transform: translateY(-2px); }
+.stat-tile { min-height: 164px; display: flex; flex-direction: column; justify-content: flex-end; }
+.stat-tile .v { font-size: 2.45rem; }
+.chart-panel { padding: 24px; }
+.callout { border: 0; border-radius: var(--radius); background: linear-gradient(135deg, #193d28, #181818 55%); padding: 26px 30px; }
+.callout::before { content: "INSIGHT"; display: block; color: #79e69f; font-size: .62rem; font-weight: 900; letter-spacing: .18em; margin-bottom: 6px; }
+.track-card { flex-basis: 180px; width: 180px; max-width: 180px; padding: 14px; border: 0; background: #181818; }
+.track-card:hover { background: #282828; border-color: transparent; transform: translateY(-5px); }
+.track-card img { border-radius: 4px; box-shadow: 0 10px 24px rgba(0,0,0,.35); }
+.track-card .t-title { font-size: .9rem; margin-top: 12px; }
+.tag { border-radius: 4px; }
+table { background: #151515; }
+tbody tr { transition: background .15s ease; }
+tbody tr:hover { background: #242424; }
+th { border-bottom-color: #424242; }
+footer { padding: 55px 0 70px; background: #080808; }
+
+@media (max-width: 980px) {
+  :root { --sidebar: 0px; }
+  body { padding-left: 0; padding-bottom: 72px; }
+  .nav {
+    inset: auto 0 0 0;
+    width: 100%;
+    height: 72px;
+    padding: 0;
+    z-index: 100;
+    border-top: 1px solid #292929;
+  }
+  .nav .wrap { height: 72px; }
+  .nav-brand, .nav-toggle, .nav-label { display: none; }
+  .nav-links, .nav-links.open {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    height: 100%;
+    background: #050505;
+    border: 0;
+    gap: 0;
+  }
+  .nav-links a { display: none; border: 0; padding: 7px 4px; min-height: 0; border-radius: 0; flex-direction: column; justify-content: center; gap: 2px; font-size: .62rem; }
+  .nav-links a:nth-of-type(1), .nav-links a:nth-of-type(3), .nav-links a:nth-of-type(5), .nav-links a:nth-of-type(8) { display: flex; }
+  .nav-icon { font-size: 1rem; }
+  .hero { min-height: auto; padding: 64px 0 50px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 34px; }
+  .hero-art { grid-row: 1; justify-content: flex-start; }
+  .hero-art img { max-width: 260px; }
+  .hero h1 { font-size: clamp(2.7rem, 12vw, 5rem); }
+}
+
+@media (max-width: 620px) {
+  .wrap { padding-left: 18px; padding-right: 18px; }
+  section { padding: 62px 0; }
+  section .wrap::before { left: 18px; right: 18px; }
+  .hero-art img { max-width: 210px; }
+  .hero-badges { display: none; }
+  .hero .lede { font-size: 1rem; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .stat-tile { min-height: 144px; padding: 17px; }
+  .stat-tile .v { font-size: 1.7rem; }
+  .callout, .callout.research-question { padding: 22px; }
+  .callout.research-question p { font-size: 1.08rem; }
+}
