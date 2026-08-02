@@ -1,6 +1,11 @@
 # Do Collaborations Make Songs More Popular on Spotify?
 
 Check it out here: https://sonalishyma.github.io/Impact-of-Featured-Spotify-Artists/ 
+
+## Project Preview
+
+![Spotify featured-artist analysis website](./SS1.png)
+
 **Measuring the featured-artist effect with proper controls — and catching our own overclaim.**
 
 
