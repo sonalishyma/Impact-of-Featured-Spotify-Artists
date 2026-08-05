@@ -33,18 +33,29 @@ This repository is my **independent reconstruction and extension** of that proje
 
 ## Data
 
-**Spotify Tracks Dataset** (maharshipandya; distributed via Kaggle/Hugging Face) — 114,000 track–genre rows with Spotify's `popularity` score (0–100), `explicit` flag, audio features, and `track_genre`. After deterministic deduplication by `track_id`: **89,741 unique tracks** (the original team's fuzzy dedup produced 89,740 — a one-row difference, documented in the notebook). A copy is included at `data/dataset.csv` (~20 MB) so the notebook runs out of the box; `src/get_data.py` re-downloads it from source.
+**Spotify Tracks Dataset** (maharshipandya; distributed via Kaggle/Hugging Face) — 114,000 track–genre rows with Spotify's `popularity` score (0–100), `explicit` flag, audio features, and `track_genre`. After deterministic deduplication by `track_id` and removal of nonpositive durations: **89,740 unique tracks**. A copy is included at `data/dataset.csv` (~20 MB) so the notebook runs out of the box; `src/get_data.py` re-downloads it from source.
 
 `has_feature = 1` if a track lists multiple artists or its title contains a featuring marker (`feat.`, `ft.`, `featuring`, `with` as whole words). The original team's exact rule could not be fully reverse-engineered (their featured count was 24,876 vs. 23,058 here — they likely also counted "&"); the robustness section shows conclusions are unchanged across definitions, including the "&" variant.
 
-## Method
+## Data cleaning
 
-1. **Group comparison** (replicating the original): descriptives, Mann–Whitney U (popularity is right-skewed and zero-inflated), plus the effect sizes the original omitted (rank-biserial r, Cohen's d).
-2. **Regression** (the proposal's plan, completed): OLS with **HC3 robust standard errors**.
-   - *Spec 1* — the controls named in our final presentation: duration, explicitness, energy, danceability.
-   - *Spec 2* — toward the proposal's fuller specification: + valence, loudness, and **genre fixed effects** (114 genres). Release year was planned in the proposal but is not available in this dataset.
-3. **Decomposition** — an exact shift-share decomposition splitting the raw gap into genre composition vs. within-genre difference (the two terms sum to the raw gap with no residual).
-4. **Diagnostics & robustness** — VIF (all < 2.6); alternate `has_feature` definitions, excluding popularity = 0, excluding remix/live/acoustic/remaster versions.
+The shared cleaning pipeline removes the source index column, keeps the first row for each `track_id`, removes nonpositive durations, converts the explicit flag to binary, converts duration to seconds, and creates `has_feature` from multiple artists or title markers such as `feat.`, `ft.`, `featuring`, and `with`. The notebook and tests import the same cleaning function so their definitions cannot silently drift.
+
+## Regression analysis (OLS with genre fixed effects)
+
+The completed analysis estimates OLS models with HC3 robust standard errors. Specification 1 controls for duration, explicitness, energy, and danceability. Specification 2 adds valence, loudness, and fixed effects for 114 genres. The featured artist coefficient falls from 1.08 points in Specification 1 to 0.28 points in Specification 2, with a 95% confidence interval from −0.01 to 0.57.
+
+The analysis also includes an exact shift share decomposition, VIF diagnostics below 2.6, alternate featured artist definitions, a version excluding zero popularity tracks, and a version excluding remix, live, acoustic, and remastered tracks.
+
+## Hypothesis testing
+
+The reported regression test evaluates **H₀: the adjusted featured artist coefficient equals zero** against the two sided alternative that it differs from zero. The fully adjusted estimate has `p = 0.062`, and its 95% confidence interval includes zero, so the analysis does not reject the null at the 5% level.
+
+The raw Mann Whitney comparison is statistically significant at approximately `p = 4.2e−26`, but the raw effect is only 1.41 points with Cohen's `d = 0.07`. With a sample near 90,000 tracks, this distinction between statistical significance and practical magnitude is central to the conclusion.
+
+## SQL analysis
+
+Seven SQLite queries independently reproduce the cleaning audit, group averages, raw popularity gap, collaboration shares by genre, within genre differences, exact genre composition decomposition, and zero popularity sensitivity check. See the [SQL analysis guide](./sql/README.md), [queries](./sql/analysis.sql), and [recorded results](./sql/results.md).
 
 ## Results
 
